@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0c10"/>
+  <meta name="description" content="Ticket Booking App - रेलवे टिकट बुकिंग के लिए आसान ऐप"/>
+  <title>टिकट बुकिंग ऐप - Ticket Request</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="manifest" id="manifestLink">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚆</text></svg>">
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --card:#121317;
+      --ink:#eaeef5;
+      --muted:#9aa3b2;
+      --accent:#5b8cff;
+      --accent-2:#22c55e;
+      --danger:#ef4444;
+      --ring:rgba(91,140,255,.35);
+      --border:#1d212a;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%; margin:0;}
+    body{
+      background:linear-gradient(180deg,#0b0c10 0%, #0e1117 100%);
+      color:var(--ink);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans";
+      padding:16px;
+    }
+    .wrap{min-height:100vh; display:flex; justify-content:center; align-items:center;}
+    .card{
+      width:100%;
+      max-width:900px;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      box-shadow:0 10px 30px rgba(0,0,0,.25);
+      padding:24px;
+      position:relative;
+    }
+    h1{margin:0 0 6px;font-weight:700;letter-spacing:.2px}
+    .sub{color:var(--muted);margin-bottom:18px}
+    .topbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:12px; flex-wrap:wrap;}
+    .lang{display:flex; gap:8px; align-items:center}
+    .lang select{background:#0b0c10;color:var(--ink);border:1px solid var(--border);padding:8px 12px;border-radius:10px}
+    .contact-icons {display: flex; gap: 12px;}
+    .contact-icons a {color: var(--muted); font-size: 20px; transition: color 0.3s;}
+    .contact-icons a:hover {color: var(--accent);}
+    .step{display:none}
+    .step.active{display:block}
+    label{display:block;margin:14px 0 6px;color:var(--muted);font-size:14px}
+    input,select,button{font:inherit}
+    input,select{width:100%;padding:12px 14px;background:#0b0c10;border:1px solid var(--border);border-radius:10px;color:var(--ink);outline:none}
+    input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 6px var(--ring)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+    .btn{appearance:none;border:none;border-radius:12px;padding:12px 16px;background:var(--accent);color:white;cursor:pointer;font-weight:600; text-decoration:none; display:inline-block;}
+    .btn.secondary{background:#2b2f38}
+    .btn.ghost{background:transparent;border:1px solid var(--border)}
+    .btn.danger{background:var(--danger)}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .summary{background:#0b0c10;border:1px dashed #2a2f3a;border-radius:12px;padding:14px;margin-top:12px;color:var(--muted)}
+    .tag{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;background:#141821;border:1px solid #202735;color:#dbe6ff;font-size:12px}
+    .tag .dot{width:8px;height:8px;border-radius:999px;background:var(--accent)}
+    .notice{background:#121924;border:1px solid #203047;border-radius:12px;padding:12px;color:#c6d4ff}
+    .ok{color:var(--accent-2);font-weight:700}
+    .warn{color:#ffce59;font-weight:700}
+    .foot{margin-top:16px;color:#8e99ab;font-size:12px}
+    .divider{height:1px;background:#1c2230;margin:16px 0}
+    .paxList{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+    .paxRow{border:1px solid var(--border);background:#0b0c10;border-radius:12px;padding:16px; margin-bottom: 16px;}
+    .paxRow .grid{display:grid;grid-template-columns:1.5fr 0.8fr 1.2fr 1.2fr auto;gap:12px}
+    .hint{color:#9aa3b2;font-size:12px;margin-top:6px}
+    .add-passenger-btn {margin-top: 16px;}
+    .qr{margin-top:18px;display:grid;place-items:center;gap:10px}
+    #qrcode{background:#0b0c10;border:1px solid #2b3340;border-radius:12px;padding:10px}
+    .circle-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #1d212a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    .circle-icon:hover {
+      background: var(--accent);
+      transform: scale(1.05);
+    }
+    .circle-icon i {
+      color: var(--muted);
+      font-size: 18px;
+    }
+    .circle-icon:hover i {
+      color: white;
+    }
+    .whatsapp-prompt {
+      background: #121924;
+      border: 1px solid #203047;
+      border-radius: 12px;
+      padding: 16px;
+      color: #c6d4ff;
+      margin-top: 20px;
+      text-align: center;
+    }
+    .install-btn {
+      margin: 15px 0;
+      padding: 12px 20px;
+      background: #5b8cff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .tatkal-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 15px 0;
+      padding: 12px;
+      background: #1a1f2e;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    
+    @media (max-width: 768px) {
+      .paxRow .grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .row {
+        grid-template-columns: 1fr;
+      }
+      .contact-icons {
+        margin-top: 10px;
+        justify-content: center;
+      }
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      .lang {
+        margin-top: 10px;
+      }
+      body {
+        padding: 10px;
+      }
+      .card {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="topbar">
+        <div>
+          <h1 id="t_title">टिकट रिक्वेस्ट</h1>
+          <div class="sub" id="t_sub">3-स्टेप प्रक्रिया • पेमेंट से पहले 5–10 मिनट में एडमिन कन्फर्म करेगा।</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+          <div class="lang">
+            <label for="langSel" style="margin:0;">🌐</label>
+            <select id="langSel">
+              <option value="hi">हिन्दी</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <div class="contact-icons">
+            <a href="https://wa.me/919458051202" target="_blank" title="WhatsApp" class="circle-icon">
+              <i class="fab fa-whatsapp"></i>
+            </a>
+            <a href="tel:+919458051202" title="Call" class="circle-icon">
+              <i class="fas fa-phone"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 1: Journey details -->
+      <section id="step1" class="step active">
+        <div class="tag"><span class="dot"></span> <span id="t_s1">स्टेप 1/3 – यात्रा विवरण</span></div>
+        <label for="from" id="t_fromL">कहां से (From)</label>
+        <input id="from" placeholder="उदाहरण: New Delhi (NDLS)" />
+        <label for="to" id="t_toL">कहां तक (To)</label>
+        <input id="to" placeholder="उदाहरण: Mumbai Central (MMCT)" />
+        <div class="row">
+          <div>
+            <label for="date" id="t_dateL">यात्रा की तिथि</label>
+            <input id="date" type="date" />
+          </div>
+          <div>
+            <label for="class" id="t_classL">क्लास</label>
+            <select id="class">
+              <option value="SL">Sleeper (SL)</option>
+              <option value="3A">3 AC (3A)</option>
+              <option value="2A">2 AC (2A)</option>
+              <option value="1A">1 AC (1A)</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Tatkal Option -->
+        <div class="tatkal-option">
+          <input type="checkbox" id="tatkal" style="width: auto;">
+          <label for="tatkal" style="display: inline; margin: 0;" id="t_tatkalL">तत्काल बुकिंग</label>
+        </div>
+        <div class="hint" id="t_tatkalHint">तत्काल बुकिंग के लिए अतिरिक्त चार्ज लगेगा और सीट उपलब्धता सुनिश्चित नहीं है।</div>
+        
+        <div class="actions">
+          <button class="btn" onclick="goStep(2)" id="t_next1">आगे</button>
+        </div>
+      </section>
+
+      <!-- STEP 2: Passengers -->
+      <section id="step2" class="step">
+        <div class="tag"><span class="dot"></span> <span id="t_s2">स्टेप 2/3 – यात्री</span></div>
+
+        <div class="hint" id="t_aadharHint">आधार केवल किसी एक यात्री का जरूरी है, बाकी के लिए वैकल्पिक।</div>
+        
+        <div id="initial-passenger">
+          <div class="paxRow">
+            <div class="grid">
+              <div>
+                <label class="lbl-name">नाम</label>
+                <input class="name" placeholder="पूरा नाम" />
+              </div>
+              <div>
+                <label class="lbl-age">उम्र</label>
+                <input class="age" type="number" min="1" max="120" placeholder="उम्र" />
+              </div>
+              <div>
+                <label class="lbl-aadhar">आधार (किसी 1 का अनिवार्य)</label>
+                <input class="aadhar" inputmode="numeric" pattern="[0-9]{12}" placeholder="1234 5678 9012" />
+              </div>
+              <div>
+                <label class="lbl-seat">सीट पसंद</label>
+                <select class="seatSel">
+                  <option value="Upper">Upper</option>
+                  <option value="Middle">Middle</option>
+                  <option value="Lower">Lower</option>
+                  <option value="Side Upper">Side Upper</option>
+                  <option value="Side Lower">Side Lower</option>
+                </select>
+              </div>
+              <div style="display:flex;align-items:end;">
+                <button type="button" class="btn danger btn-remove" style="display:none;">हटाएं</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div id="additional-passengers" style="display: none;"></div>
+        
+        <div class="add-passenger-btn">
+          <button class="btn ghost" onclick="addPassenger()" id="t_addPax">+ अतिरिक्त यात्री जोड़ें</button>
+        </div>
+        
+        <div class="actions">
+          <button class="btn secondary" onclick="goStep(1)" id="t_back1">वापस</button>
+          <button class="btn" onclick="goStep(3)" id="t_next2">आगे</button>
+        </div>
+        <div class="summary" id="sum1">विवरण सारांश…</div>
+      </section>
+
+      <!-- STEP 3: WhatsApp + QR Code -->
+      <section id="step3" class="step">
+        <div class="tag"><span class="dot"></span> <span id="t_s3">स्टेप 3/3 – कन्फर्मेशन और पेमेंट</span></div>
+        
+        <div class="whatsapp-prompt">
+          <div style="font-weight:700;margin-bottom:10px;font-size:18px;">WhatsApp पर जरूर भेजें अपनी पूरी डिटेल</div>
+          <p style="margin:10px 0;">तभी आपको पता चल पाएगा कि टिकट कन्फर्म हो पाएगी या नहीं हो पाएगी।</p>
+          
+          <div style="margin:20px 0;">
+            <a id="whatsappBtn" href="#" target="_blank" class="btn" style="background-color:#25D366;color:white;padding:12px 24px;">
+              <i class="fab fa-whatsapp"></i> WhatsApp पर भेजें
+            </a>
+          </div>
+        </div>
+
+        <div class="qr">
+          <div id="qrcode"></div>
+          <div class="summary" id="sum2">—</div>
+        </div>
+
+        <div class="actions">
+          <button class="btn secondary" onclick="goStep(2)" id="t_back2">वापस</button>
+          <a class="btn" id="btnPay" target="_blank" rel="noopener" aria-disabled="true">एडमिन कन्फर्म के बाद पेमेंट</a>
+        </div>
+
+        <div class="divider"></div>
+        <div class="foot" id="t_foot">नोट: UPI पेमेंट आपकी ऐप में खुलेगा। पेमेंट एडमिन कन्फर्मेशन के बाद ही करें।</div>
+      </section>
+
+      <!-- Install Prompt -->
+      <div id="installPrompt" style="display: none; margin-top: 20px; text-align: center; padding: 15px; background: #1a1f2e; border-radius: 12px;">
+        <h3>इस ऐप को इंस्टॉल करें</h3>
+        <p>होम स्क्रीन पर जोड़ें और ऐप की तरह उपयोग करें</p>
+        <button id="installButton" class="install-btn">इंस्टॉल करें</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QRCode.js library -->
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
+
+  <script>
+    // PWA Manifest
+    const manifestData = {
+      "name": "टिकट बुकिंग ऐप",
+      "short_name": "TicketApp",
+      "description": "रेलवे टिकट बुकिंग के लिए आसान ऐप",
+      "start_url": "/",
+      "display": "standalone",
+      "background_color": "#0b0c10",
+      "theme_color": "#0b0c10",
+      "icons": [
+        {
+          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚆</text></svg>",
+          "sizes": "192x192",
+          "type": "image/svg+xml"
+        }
+      ]
+    };
+
+    // Create manifest dynamically
+    const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
+    const manifestURL = URL.createObjectURL(manifestBlob);
+    document.getElementById('manifestLink').setAttribute('href', manifestURL);
+
+    // Install Prompt
+    let deferredPrompt;
+    const installPrompt = document.getElementById('installPrompt');
+    const installButton = document.getElementById('installButton');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installPrompt.style.display = 'block';
+    });
+
+    installButton.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          installPrompt.style.display = 'none';
+        }
+        deferredPrompt = null;
+      }
+    });
+
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js')
+          .then(function(registration) {
+            console.log('ServiceWorker registration successful');
+          })
+          .catch(function(err) {
+            console.log('ServiceWorker registration failed: ', err);
+          });
+      });
+    }
+
+    // ------- i18n strings -------
+    const STR = {
+      hi: {
+        title: 'टिकट रिक्वेस्ट',
+        sub: '3-स्टेप प्रक्रिया • पेमेंट से पहले 5–10 मिनट में एडमिन कन्फर्म करेगा।',
+        s1: 'स्टेप 1/3 – यात्रा विवरण',
+        fromL: 'कहां से (From)',
+        toL: 'कहां तक (To)',
+        dateL: 'यात्रा की तिथि',
+        classL: 'क्लास',
+        next: 'आगे',
+        s2: 'स्टेप 2/3 – यात्री',
+        aadharHint: 'आधार केवल किसी एक यात्री का जरूरी है, बाकी के लिए वैकल्पिक।',
+        addPax: '+ अतिरिक्त यात्री जोड़ें',
+        back: 'वापस',
+        s3: 'स्टेप 3/3 – कन्फर्मेशन और पेमेंट',
+        imp: 'महत्वपूर्ण',
+        msg1: 'अभी आपको 10 मिनट के अंदर एडमिन बताएगा कि टिकट बुक हो पाएगी या नहीं। अगर टिकट बुक होने वाली है तभी पेमेंट करें, अन्यथा पेमेंट न करें।',
+        start: '10-मिनट टाइमर शुरू करें',
+        pay: 'एडमिन कन्फर्म के बाद पेमेंट',
+        foot: 'नोट: UPI पेमेंट आपकी ऐप में खुलेगा। पेमेंट एडमिन कन्फर्मेशन के बाद ही करें।',
+        name:'नाम', age:'उम्र', aadhar:'आधार (किसी 1 का अनिवार्य)', seat:'सीट पसंद', remove:'हटाएं',
+        seatOpts:['Upper','Middle','Lower','Side Upper','Side Lower'],
+        recap:'विवरण सारांश',
+        whatsappMsg: 'WhatsApp पर जरूर भेजें अपनी पूरी डिटेल',
+        whatsappDesc: 'तभी आपको पता चल पाएगा कि टिकट कन्फर्म हो पाएगी या नहीं हो पाएगी।',
+        tatkalL: 'तत्काल बुकिंग',
+        tatkalHint: 'तत्काल बुकिंग के लिए अतिरिक्त चार्ज लगेगा और सीट उपलब्धता सुनिश्चित नहीं है।'
+      },
+      en: {
+        title: 'Ticket Request',
+        sub: 'Simple 3-step flow • Admin will confirm in 5–10 minutes before payment.',
+        s1: 'Step 1 of 3 – Journey details',
+        fromL: 'From',
+        toL: 'To',
+        dateL: 'Date of journey',
+        classL: 'Class',
+        next: 'Next',
+        s2: 'Step 2 of 3 – Passengers',
+        aadharHint: 'Aadhaar is required for any one passenger only. Others optional.',
+        addPax: '+ Add Additional Passenger',
+        back: 'Back',
+        s3: 'Step 3 of 3 – Confirmation & Payment',
+        imp: 'IMPORTANT',
+        msg1: 'Admin will reply within 10 minutes whether the ticket can be booked. Pay only if it will be booked. Otherwise, do not pay.',
+        start: 'Start 10-min Timer',
+        pay: 'Pay after Admin Confirms',
+        foot: 'Note: UPI payment opens in your app. Pay only after admin confirmation.',
+        name:'Name', age:'Age', aadhar:'Aadhaar (required for any 1)', seat:'Seat Preference', remove:'Remove',
+        seatOpts:['Upper','Middle','Lower','Side Upper','Side Lower'],
+        recap:'Details recap',
+        whatsappMsg: 'Send all your information on WhatsApp',
+        whatsappDesc: 'Only then you will know if the ticket can be confirmed or not.',
+        tatkalL: 'Tatkal Booking',
+        tatkalHint: 'Extra charges will apply for Tatkal booking and seat availability is not guaranteed.'
+      }
+    };
+
+    const langSel = document.getElementById('langSel');
+    let LANG = 'hi';
+
+    function applyLang(){
+      const S = STR[LANG];
+      document.getElementById('t_title').textContent = S.title;
+      document.getElementById('t_sub').textContent = S.sub;
+      document.getElementById('t_s1').textContent = S.s1;
+      document.getElementById('t_fromL').textContent = S.fromL;
+      document.getElementById('t_toL').textContent = S.toL;
+      document.getElementById('t_dateL').textContent = S.dateL;
+      document.getElementById('t_classL').textContent = S.classL;
+      document.getElementById('t_next1').textContent = S.next;
+      document.getElementById('t_s2').textContent = S.s2;
+      document.getElementById('t_aadharHint').textContent = S.aadharHint;
+      document.getElementById('t_addPax').textContent = S.addPax;
+      document.getElementById('t_back1').textContent = S.back;
+      document.getElementById('t_next2').textContent = S.next;
+      document.getElementById('t_s3').textContent = S.s3;
+      document.getElementById('t_back2').textContent = S.back;
+      document.getElementById('btnPay').textContent = S.pay;
+      document.getElementById('t_foot').textContent = S.foot;
+      document.getElementById('t_tatkalL').textContent = S.tatkalL;
+      document.getElementById('t_tatkalHint').textContent = S.tatkalHint;
+
+      // Update WhatsApp section
+      const whatsappSection = document.querySelector('.whatsapp-prompt');
+      if (whatsappSection) {
+        whatsappSection.querySelector('div:first-child').textContent = S.whatsappMsg;
+        whatsappSection.querySelector('p:first-of-type').textContent = S.whatsappDesc;
+        whatsappSection.querySelector('a').innerHTML = `<i class="fab fa-whatsapp"></i> ${LANG === 'hi' ? 'WhatsApp पर भेजें' : 'Send on WhatsApp'}`;
+      }
+
+      // Update passenger labels
+      document.querySelectorAll('.paxRow').forEach(row=>{
+        row.querySelector('.lbl-name').textContent = S.name;
+        row.querySelector('.lbl-age').textContent = S.age;
+        
+        // Only show Aadhar field for first passenger
+        const aadharLabel = row.querySelector('.lbl-aadhar');
+        const aadharInput = row.querySelector('.aadhar');
+        if (row === document.querySelector('.paxRow')) {
+          aadharLabel.textContent = S.aadhar;
+          aadharLabel.style.display = 'block';
+          aadharInput.style.display = 'block';
+        } else {
+          aadharLabel.style.display = 'none';
+          aadharInput.style.display = 'none';
+        }
+        
+        row.querySelector('.lbl-seat').textContent = S.seat;
+        row.querySelector('.btn-remove').textContent = S.remove;
+        const seatSel = row.querySelector('.seatSel');
+        const vals=['Upper','Middle','Lower','Side Upper','Side Lower'];
+        seatSel.innerHTML = '';
+        S.seatOpts.forEach((txt,i)=>{
+          const opt = document.createElement('option');
+          opt.value = vals[i];
+          opt.textContent = txt;
+          seatSel.appendChild(opt);
+        });
+      });
+    }
+
+    langSel.addEventListener('change',()=>{ LANG = langSel.value; applyLang(); });
+
+    // ------- Steps & data -------
+    const s1 = document.getElementById('step1');
+    const s2 = document.getElementById('step2');
+    const s3 = document.getElementById('step3');
+    const fields = {
+      from: document.getElementById('from'),
+      to: document.getElementById('to'),
+      date: document.getElementById('date'),
+      cls: document.getElementById('class'),
+      tatkal: document.getElementById('tatkal')
+    };
+    const sum1 = document.getElementById('sum1');
+    const sum2 = document.getElementById('sum2');
+    const btnPay = document.getElementById('btnPay');
+    const additionalPassengers = document.getElementById('additional-passengers');
+    const whatsappBtn = document.getElementById('whatsappBtn');
+
+    function goStep(n){
+      if(n===2){
+        if(!fields.from.value.trim()||!fields.to.value.trim()||!fields.date.value){
+          alert(LANG==='hi'?'कृपया From, To और Date भरें':'Please fill From, To and Date');
+          return;
+        }
+      }
+      if(n===3){
+        // Validate at least one Aadhaar filled for first passenger only
+        const firstAadhar = document.querySelector('.paxRow .aadhar').value.trim();
+        if(!firstAadhar){
+          alert(LANG==='hi'?'कम-से-कम किसी एक यात्री का आधार नंबर भरें':'Please enter Aadhaar for at least one passenger');
+          return;
+        }
+        buildQR();
+        prepareWhatsAppMessage();
+      }
+      if(n>=2){
+        const paxCount = document.querySelectorAll('.paxRow').length;
+        const tatkalText = fields.tatkal.checked ? (LANG==='hi' ? ' (तत्काल)' : ' (Tatkal)') : '';
+        const recap = `${(LANG==='hi')? 'कहां से':''} ${fields.from.value}\n${(LANG==='hi')? 'कहां तक':''} ${fields.to.value}\n${(LANG==='hi')? 'तिथि':''} ${fields.date.value}\n${(LANG==='hi')? 'क्लास':''} ${fields.cls.value}${tatkalText}\n${(LANG==='hi')? 'यात्री': 'Passengers'}: ${paxCount}`;
+        sum1.textContent = recap;
+      }
+      if(n===3){
+        const recap2 = (LANG==='hi') ? 'एडमिन 10 मिनट में कन्फर्म करेगा। कन्फर्म होने पर ही पेमेंट करें।' : 'Admin will confirm in 10 minutes. Pay only after confirmation.';
+        sum2.textContent = recap2;
+      }
+      [s1,s2,s3].forEach((el,i)=>{ el.classList.toggle('active', i===n-1); });
+    }
+
+    // ------- Passenger rows -------
+    function passengerRow(){
+      const S = STR[LANG];
+      const row = document.createElement('div');
+      row.className='paxRow';
+      row.innerHTML = `
+        <div class="grid">
+          <div>
+            <label class="lbl-name">${S.name}</label>
+            <input class="name" placeholder="${S.name}" />
+          </div>
+          <div>
+            <label class="lbl-age">${S.age}</label>
+            <input class="age" type="number" min="1" max="120" placeholder="${S.age}" />
+          </div>
+          <div>
+            <label class="lbl-aadhar" style="display: none;">${S.aadhar}</label>
+            <input class="aadhar" inputmode="numeric" pattern="[0-9]{12}" placeholder="1234 5678 9012" style="display: none;" />
+          </div>
+          <div>
+            <label class="lbl-seat">${S.seat}</label>
+            <select class="seatSel"></select>
+          </div>
+          <div style="display:flex;align-items:end;">
+            <button type="button" class="btn danger btn-remove">${S.remove}</button>
+          </div>
+        </div>`;
+      row.querySelector('.btn-remove').addEventListener('click',()=>{
+        row.remove();
+      });
+      additionalPassengers.appendChild(row);
+      applyLang();
+    }
+
+    function addPassenger(){ 
+      additionalPassengers.style.display = 'block';
+      passengerRow(); 
+    }
+
+    // ------- UPI QR -------
+    const UPI_ID = 'karanyadayji971@okaxis';
+    const PAYEE_NAME = 'Karan Yadav';
+
+    function buildQR(){
+      // Clear any existing QR code
+      document.getElementById('qrcode').innerHTML = '';
+      
+      // Amount intentionally omitted; admin confirms amount first
+      const params = new URLSearchParams({ pa: UPI_ID, pn: PAYEE_NAME, cu: 'INR' });
+      const upiString = `upi://pay?${params.toString()}`;
+      
+      // Create QR code
+      new QRCode(document.getElementById('qrcode'), {
+        text: upiString,
+        width: 180,
+        height: 180
+      });
+    }
+
+    // ------- WhatsApp Integration -------
+    function prepareWhatsAppMessage(){
+      // Collect all passenger data
+      const passengers = [];
+      document.querySelectorAll('.paxRow').forEach((row, index) => {
+        passengers.push({
+          name: row.querySelector('.name').value,
+          age: row.querySelector('.age').value,
+          aadhar: index === 0 ? row.querySelector('.aadhar').value : 'नहीं दिया गया',
+          seat: row.querySelector('.seatSel').value
+        });
+      });
+      
+      // Create message
+      const tatkalText = fields.tatkal.checked ? (LANG==='hi' ? '%0A*तत्काल बुकिंग:* हाँ' : '%0A*Tatkal Booking:* Yes') : '';
+      const message = `*टिकट रिक्वेस्ट डिटेल्स* 🚆%0A%0A` +
+        `*From:* ${fields.from.value}%0A` +
+        `*To:* ${fields.to.value}%0A` +
+        `*Date:* ${fields.date.value}%0A` +
+        `*Class:* ${fields.cls.value}${tatkalText}%0A%0A` +
+        `*यात्री विवरण:*%0A` +
+        passengers.map((p, i) => 
+          `${i+1}. ${p.name} (उम्र: ${p.age}, आधार: ${p.aadhar || 'नहीं दिया गया'}, सीट: ${p.seat})`
+        ).join('%0A') +
+        `%0A%0Aकृपया इस टिकट की उपलब्धता की पुष्टि करें।`;
+      
+      // Update WhatsApp button with the details
+      whatsappBtn.href = `https://wa.me/919458051202?text=${message}`;
+    }
+
+    // Initialize
+    applyLang();
+  </script>
+</body>
+</html>
