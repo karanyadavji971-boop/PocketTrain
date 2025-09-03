@@ -4,11 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#0b0c10"/>
-  <meta name="description" content="Ticket Booking App - रेलवे टिकट बुकिंग के लिए आसान ऐप"/>
+  <meta name="description" content="Ticket Booking App - रेलवे और फ्लाइट टिकट बुकिंग के लिए आसान ऐप"/>
   <title>टिकट बुकिंग ऐप - Ticket Request</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="manifest" id="manifestLink">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚆</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️🚆</text></svg>">
   <style>
     :root{
       --bg:#0b0c10;
@@ -127,12 +126,98 @@
       border: 1px solid var(--border);
     }
     
+    /* Travel type selection */
+    .travel-type {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .travel-type-btn {
+      padding: 12px 16px;
+      text-align: center;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #121317;
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .travel-type-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    
+    /* Flight type selection */
+    .flight-type {
+      display: flex;
+      gap: 12px;
+      margin: 12px 0;
+      flex-wrap: wrap;
+    }
+    .flight-type-btn {
+      padding: 10px 14px;
+      text-align: center;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #121317;
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+    .flight-type-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    
+    /* Form sections */
+    .flight-options {
+      display: none;
+      background: #0f1219;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 12px;
+      border: 1px solid var(--border);
+    }
+    .flight-options.active {
+      display: block;
+    }
+    
+    .compact-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .compact-field {
+      margin-bottom: 12px;
+    }
+    .compact-field label {
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+    .compact-select {
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+    
+    .return-date-container {
+      display: none;
+    }
+    .return-date-container.active {
+      display: block;
+    }
+    
     @media (max-width: 768px) {
       .paxRow .grid {
         grid-template-columns: 1fr;
         gap: 10px;
       }
       .row {
+        grid-template-columns: 1fr;
+      }
+      .compact-row {
         grid-template-columns: 1fr;
       }
       .contact-icons {
@@ -152,6 +237,12 @@
       }
       .card {
         padding: 16px;
+      }
+      .travel-type {
+        flex-direction: column;
+      }
+      .flight-type {
+        flex-direction: column;
       }
     }
   </style>
@@ -186,35 +277,107 @@
       <!-- STEP 1: Journey details -->
       <section id="step1" class="step active">
         <div class="tag"><span class="dot"></span> <span id="t_s1">स्टेप 1/3 – यात्रा विवरण</span></div>
-        <label for="from" id="t_fromL">कहां से (From)</label>
-        <input id="from" placeholder="उदाहरण: New Delhi (NDLS)" />
-        <label for="to" id="t_toL">कहां तक (To)</label>
-        <input id="to" placeholder="उदाहरण: Mumbai Central (MMCT)" />
-        <div class="row">
-          <div>
-            <label for="date" id="t_dateL">यात्रा की तिथि</label>
-            <input id="date" type="date" />
+        
+        <!-- Travel Type Selection -->
+        <div class="travel-type">
+          <div class="travel-type-btn active" id="trainOption">
+            <i class="fas fa-train"></i> <span id="t_trainOption">ट्रेन</span>
           </div>
-          <div>
-            <label for="class" id="t_classL">क्लास</label>
-            <select id="class">
-              <option value="SL">Sleeper (SL)</option>
-              <option value="3A">3 AC (3A)</option>
-              <option value="2A">2 AC (2A)</option>
-              <option value="1A">1 AC (1A)</option>
-            </select>
+          <div class="travel-type-btn" id="flightOption">
+            <i class="fas fa-plane"></i> <span id="t_flightOption">फ्लाइट</span>
           </div>
         </div>
         
-        <!-- Tatkal Option -->
-        <div class="tatkal-option">
-          <input type="checkbox" id="tatkal" style="width: auto;">
-          <label for="tatkal" style="display: inline; margin: 0;" id="t_tatkalL">तत्काल बुकिंग</label>
+        <!-- Train Options (Default) -->
+        <div id="trainOptions">
+          <label for="from" id="t_fromL">कहां से (From)</label>
+          <input id="from" placeholder="उदाहरण: New Delhi (NDLS)" />
+          <label for="to" id="t_toL">कहां तक (To)</label>
+          <input id="to" placeholder="उदाहरण: Mumbai Central (MMCT)" />
+          <div class="row">
+            <div>
+              <label for="date" id="t_dateL">यात्रा की तिथि</label>
+              <input id="date" type="date" />
+            </div>
+            <div>
+              <label for="class" id="t_classL">क्लास</label>
+              <select id="class">
+                <option value="SL">Sleeper (SL)</option>
+                <option value="3A">3 AC (3A)</option>
+                <option value="2A">2 AC (2A)</option>
+                <option value="1A">1 AC (1A)</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Tatkal Option -->
+          <div class="tatkal-option">
+            <input type="checkbox" id="tatkal" style="width: auto;">
+            <label for="tatkal" style="display: inline; margin: 0;" id="t_tatkalL">तत्काल बुकिंग</label>
+          </div>
+          <div class="hint" id="t_tatkalHint">तत्काल बुकिंग के लिए अतिरिक्त चार्ज लगेगा और सीट उपलब्धता सुनिश्चित नहीं है।</div>
         </div>
-        <div class="hint" id="t_tatkalHint">तत्काल बुकिंग के लिए अतिरिक्त चार्ज लगेगा और सीट उपलब्धता सुनिश्चित नहीं है।</div>
+        
+        <!-- Flight Options (Hidden by default) -->
+        <div id="flightOptions" class="flight-options">
+          <div class="compact-row">
+            <div class="compact-field">
+              <label for="flightFrom" id="t_flightFromL">उड़ान कहां से</label>
+              <input id="flightFrom" placeholder="Delhi (DEL)" />
+            </div>
+            <div class="compact-field">
+              <label for="flightTo" id="t_flightToL">उड़ान कहां तक</label>
+              <input id="flightTo" placeholder="Mumbai (BOM)" />
+            </div>
+          </div>
+          
+          <div class="compact-row">
+            <div class="compact-field">
+              <label for="departureDate" id="t_departureDateL">जाने की तिथि</label>
+              <input id="departureDate" type="date" />
+            </div>
+            <div class="compact-field return-date-container" id="returnDateContainer">
+              <label for="returnDate" id="t_returnDateL">वापसी की तिथि</label>
+              <input id="returnDate" type="date" />
+            </div>
+          </div>
+          
+          <div class="compact-row">
+            <div class="compact-field">
+              <label for="flightClass" id="t_flightClassL">क्लास</label>
+              <select id="flightClass" class="compact-select">
+                <option value="Economy">इकोनॉमी</option>
+                <option value="Premium Economy">प्रीमियम इकोनॉमी</option>
+                <option value="Business">बिजनेस</option>
+                <option value="First">फर्स्ट</option>
+              </select>
+            </div>
+            <div class="compact-field">
+              <label for="passengers" id="t_passengersL">यात्री</label>
+              <select id="passengers" class="compact-select">
+                <option value="1">1 यात्री</option>
+                <option value="2">2 यात्री</option>
+                <option value="3">3 यात्री</option>
+                <option value="4">4 यात्री</option>
+                <option value="5">5 यात्री</option>
+                <option value="6">6 यात्री</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- One-way/Round-trip option -->
+          <div class="flight-type">
+            <div class="flight-type-btn active" id="oneWayOption">
+              <span id="t_oneWay">वन-वे</span>
+            </div>
+            <div class="flight-type-btn" id="roundTripOption">
+              <span id="t_roundTrip">राउंड ट्रिप</span>
+            </div>
+          </div>
+        </div>
         
         <div class="actions">
-          <button class="btn" onclick="goStep(2)" id="t_next1">आगे</button>
+          <button class="btn" id="t_next1">आगे</button>
         </div>
       </section>
 
@@ -239,7 +402,7 @@
                 <label class="lbl-aadhar">आधार (किसी 1 का अनिवार्य)</label>
                 <input class="aadhar" inputmode="numeric" pattern="[0-9]{12}" placeholder="1234 5678 9012" />
               </div>
-              <div>
+              <div id="seatPreferenceSection">
                 <label class="lbl-seat">सीट पसंद</label>
                 <select class="seatSel">
                   <option value="Upper">Upper</option>
@@ -247,6 +410,14 @@
                   <option value="Lower">Lower</option>
                   <option value="Side Upper">Side Upper</option>
                   <option value="Side Lower">Side Lower</option>
+                </select>
+              </div>
+              <div id="flightSeatSection" style="display:none;">
+                <label class="lbl-seat">सीट पसंद</label>
+                <select class="flightSeatSel">
+                  <option value="Window">विंडो</option>
+                  <option value="Aisle">एसील</option>
+                  <option value="Middle">मिडिल</option>
                 </select>
               </div>
               <div style="display:flex;align-items:end;">
@@ -259,12 +430,12 @@
         <div id="additional-passengers" style="display: none;"></div>
         
         <div class="add-passenger-btn">
-          <button class="btn ghost" onclick="addPassenger()" id="t_addPax">+ अतिरिक्त यात्री जोड़ें</button>
+          <button class="btn ghost" id="t_addPax">+ अतिरिक्त यात्री जोड़ें</button>
         </div>
         
         <div class="actions">
-          <button class="btn secondary" onclick="goStep(1)" id="t_back1">वापस</button>
-          <button class="btn" onclick="goStep(3)" id="t_next2">आगे</button>
+          <button class="btn secondary" id="t_back1">वापस</button>
+          <button class="btn" id="t_next2">आगे</button>
         </div>
         <div class="summary" id="sum1">विवरण सारांश…</div>
       </section>
@@ -290,20 +461,13 @@
         </div>
 
         <div class="actions">
-          <button class="btn secondary" onclick="goStep(2)" id="t_back2">वापस</button>
+          <button class="btn secondary" id="t_back2">वापस</button>
           <a class="btn" id="btnPay" target="_blank" rel="noopener" aria-disabled="true">एडमिन कन्फर्म के बाद पेमेंट</a>
         </div>
 
         <div class="divider"></div>
         <div class="foot" id="t_foot">नोट: UPI पेमेंट आपकी ऐप में खुलेगा। पेमेंट एडमिन कन्फर्मेशन के बाद ही करें।</div>
       </section>
-
-      <!-- Install Prompt -->
-      <div id="installPrompt" style="display: none; margin-top: 20px; text-align: center; padding: 15px; background: #1a1f2e; border-radius: 12px;">
-        <h3>इस ऐप को इंस्टॉल करें</h3>
-        <p>होम स्क्रीन पर जोड़ें और ऐप की तरह उपयोग करें</p>
-        <button id="installButton" class="install-btn">इंस्टॉल करें</button>
-      </div>
     </div>
   </div>
 
@@ -311,64 +475,6 @@
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs@gh-pages/qrcode.min.js"></script>
 
   <script>
-    // PWA Manifest
-    const manifestData = {
-      "name": "टिकट बुकिंग ऐप",
-      "short_name": "TicketApp",
-      "description": "रेलवे टिकट बुकिंग के लिए आसान ऐप",
-      "start_url": "/",
-      "display": "standalone",
-      "background_color": "#0b0c10",
-      "theme_color": "#0b0c10",
-      "icons": [
-        {
-          "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚆</text></svg>",
-          "sizes": "192x192",
-          "type": "image/svg+xml"
-        }
-      ]
-    };
-
-    // Create manifest dynamically
-    const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
-    const manifestURL = URL.createObjectURL(manifestBlob);
-    document.getElementById('manifestLink').setAttribute('href', manifestURL);
-
-    // Install Prompt
-    let deferredPrompt;
-    const installPrompt = document.getElementById('installPrompt');
-    const installButton = document.getElementById('installButton');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installPrompt.style.display = 'block';
-    });
-
-    installButton.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          installPrompt.style.display = 'none';
-        }
-        deferredPrompt = null;
-      }
-    });
-
-    // Service Worker Registration
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('sw.js')
-          .then(function(registration) {
-            console.log('ServiceWorker registration successful');
-          })
-          .catch(function(err) {
-            console.log('ServiceWorker registration failed: ', err);
-          });
-      });
-    }
-
     // ------- i18n strings -------
     const STR = {
       hi: {
@@ -386,17 +492,28 @@
         back: 'वापस',
         s3: 'स्टेप 3/3 – कन्फर्मेशन और पेमेंट',
         imp: 'महत्वपूर्ण',
-        msg1: 'अभी आपको 10 मिनट के अंदर एडमिन बताएगा कि टिकट बुक हो पाएगी या नहीं। अगर टिकट बुक होने वाली है तभी पेमेंट करें, अन्यथा पेमेंट न करें।',
+        msg1: 'अभी आपको 10 मिनट के अंदर एडमिन बताएगा कि टिकट बुक हो पाएगी या नहीं। अगर टिकट बुक होने वाली है तभी पेमेंट करें, अन्यथा पेमेंट न करें。',
         start: '10-मिनट टाइमर शुरू करें',
         pay: 'एडमिन कन्फर्म के बाद पेमेंट',
-        foot: 'नोट: UPI पेमेंट आपकी ऐप में खुलेगा। पेमेंट एडमिन कन्फर्मेशन के बाद ही करें।',
+        foot: 'नोट: UPI पेमेंट आपकी ऐप में खुलेगा। पेमेंट एडमین कन्फर्मेशन के बाद ही करें。',
         name:'नाम', age:'उम्र', aadhar:'आधार (किसी 1 का अनिवार्य)', seat:'सीट पसंद', remove:'हटाएं',
         seatOpts:['Upper','Middle','Lower','Side Upper','Side Lower'],
+        flightSeatOpts:['विंडो','एसील','मिडिल'],
         recap:'विवरण सारांश',
         whatsappMsg: 'WhatsApp पर जरूर भेजें अपनी पूरी डिटेल',
         whatsappDesc: 'तभी आपको पता चल पाएगा कि टिकट कन्फर्म हो पाएगी या नहीं हो पाएगी।',
         tatkalL: 'तत्काल बुकिंग',
-        tatkalHint: 'तत्काल बुकिंग के लिए अतिरिक्त चार्ज लगेगा और सीट उपलब्धता सुनिश्चित नहीं है।'
+        tatkalHint: 'तत्काल बुकिंग के लिए अतिरिक्त चार्ज लगेगा और सीट उपलब्धता सुनिश्चित नहीं है।',
+        trainOption: 'ट्रेन',
+        flightOption: 'फ्लाइट',
+        flightFromL: 'उड़ान कहां से',
+        flightToL: 'उड़ान कहां तक',
+        departureDateL: 'जाने की तिथि',
+        returnDateL: 'वापसी की तिथि',
+        flightClassL: 'क्लास',
+        passengersL: 'यात्री',
+        oneWay: 'वन-वे',
+        roundTrip: 'राउंड ट्रिप'
       },
       en: {
         title: 'Ticket Request',
@@ -419,11 +536,22 @@
         foot: 'Note: UPI payment opens in your app. Pay only after admin confirmation.',
         name:'Name', age:'Age', aadhar:'Aadhaar (required for any 1)', seat:'Seat Preference', remove:'Remove',
         seatOpts:['Upper','Middle','Lower','Side Upper','Side Lower'],
+        flightSeatOpts:['Window','Aisle','Middle'],
         recap:'Details recap',
         whatsappMsg: 'Send all your information on WhatsApp',
         whatsappDesc: 'Only then you will know if the ticket can be confirmed or not.',
         tatkalL: 'Tatkal Booking',
-        tatkalHint: 'Extra charges will apply for Tatkal booking and seat availability is not guaranteed.'
+        tatkalHint: 'Extra charges will apply for Tatkal booking and seat availability is not guaranteed.',
+        trainOption: 'Train',
+        flightOption: 'Flight',
+        flightFromL: 'Flight From',
+        flightToL: 'Flight To',
+        departureDateL: 'Departure Date',
+        returnDateL: 'Return Date',
+        flightClassL: 'Class',
+        passengersL: 'Passengers',
+        oneWay: 'One Way',
+        roundTrip: 'Round Trip'
       }
     };
 
@@ -451,6 +579,16 @@
       document.getElementById('t_foot').textContent = S.foot;
       document.getElementById('t_tatkalL').textContent = S.tatkalL;
       document.getElementById('t_tatkalHint').textContent = S.tatkalHint;
+      document.getElementById('t_trainOption').textContent = S.trainOption;
+      document.getElementById('t_flightOption').textContent = S.flightOption;
+      document.getElementById('t_flightFromL').textContent = S.flightFromL;
+      document.getElementById('t_flightToL').textContent = S.flightToL;
+      document.getElementById('t_departureDateL').textContent = S.departureDateL;
+      document.getElementById('t_returnDateL').textContent = S.returnDateL;
+      document.getElementById('t_flightClassL').textContent = S.flightClassL;
+      document.getElementById('t_passengersL').textContent = S.passengersL;
+      document.getElementById('t_oneWay').textContent = S.oneWay;
+      document.getElementById('t_roundTrip').textContent = S.roundTrip;
 
       // Update WhatsApp section
       const whatsappSection = document.querySelector('.whatsapp-prompt');
@@ -479,19 +617,59 @@
         
         row.querySelector('.lbl-seat').textContent = S.seat;
         row.querySelector('.btn-remove').textContent = S.remove;
-        const seatSel = row.querySelector('.seatSel');
-        const vals=['Upper','Middle','Lower','Side Upper','Side Lower'];
-        seatSel.innerHTML = '';
-        S.seatOpts.forEach((txt,i)=>{
-          const opt = document.createElement('option');
-          opt.value = vals[i];
-          opt.textContent = txt;
-          seatSel.appendChild(opt);
-        });
+        
+        // Update seat options based on travel type
+        if (travelType === 'train') {
+          const seatSel = row.querySelector('.seatSel');
+          const vals=['Upper','Middle','Lower','Side Upper','Side Lower'];
+          seatSel.innerHTML = '';
+          S.seatOpts.forEach((txt,i)=>{
+            const opt = document.createElement('option');
+            opt.value = vals[i];
+            opt.textContent = txt;
+            seatSel.appendChild(opt);
+          });
+        } else {
+          const flightSeatSel = row.querySelector('.flightSeatSel');
+          const vals=['Window','Aisle','Middle'];
+          flightSeatSel.innerHTML = '';
+          S.flightSeatOpts.forEach((txt,i)=>{
+            const opt = document.createElement('option');
+            opt.value = vals[i];
+            opt.textContent = txt;
+            flightSeatSel.appendChild(opt);
+          });
+        }
       });
     }
 
-    langSel.addEventListener('change',()=>{ LANG = langSel.value; applyLang(); });
+    langSel.addEventListener('change',()=>{ 
+      LANG = langSel.value; 
+      applyLang(); 
+    });
+
+    // ------- Travel Type Selection -------
+    let travelType = 'train';
+    let tripType = 'oneWay';
+    
+    function selectTravelType(type) {
+      travelType = type;
+      document.getElementById('trainOption').classList.toggle('active', type === 'train');
+      document.getElementById('flightOption').classList.toggle('active', type === 'flight');
+      document.getElementById('trainOptions').style.display = type === 'train' ? 'block' : 'none';
+      document.getElementById('flightOptions').classList.toggle('active', type === 'flight');
+      
+      // Update seat preference section
+      document.getElementById('seatPreferenceSection').style.display = type === 'train' ? 'block' : 'none';
+      document.getElementById('flightSeatSection').style.display = type === 'flight' ? 'block' : 'none';
+    }
+    
+    function selectTripType(type) {
+      tripType = type;
+      document.getElementById('oneWayOption').classList.toggle('active', type === 'oneWay');
+      document.getElementById('roundTripOption').classList.toggle('active', type === 'roundTrip');
+      document.getElementById('returnDateContainer').classList.toggle('active', type === 'roundTrip');
+    }
 
     // ------- Steps & data -------
     const s1 = document.getElementById('step1');
@@ -502,7 +680,13 @@
       to: document.getElementById('to'),
       date: document.getElementById('date'),
       cls: document.getElementById('class'),
-      tatkal: document.getElementById('tatkal')
+      tatkal: document.getElementById('tatkal'),
+      flightFrom: document.getElementById('flightFrom'),
+      flightTo: document.getElementById('flightTo'),
+      departureDate: document.getElementById('departureDate'),
+      returnDate: document.getElementById('returnDate'),
+      flightClass: document.getElementById('flightClass'),
+      passengers: document.getElementById('passengers')
     };
     const sum1 = document.getElementById('sum1');
     const sum2 = document.getElementById('sum2');
@@ -512,9 +696,20 @@
 
     function goStep(n){
       if(n===2){
-        if(!fields.from.value.trim()||!fields.to.value.trim()||!fields.date.value){
-          alert(LANG==='hi'?'कृपया From, To और Date भरें':'Please fill From, To and Date');
-          return;
+        if(travelType === 'train') {
+          if(!fields.from.value.trim()||!fields.to.value.trim()||!fields.date.value){
+            alert(LANG==='hi'?'कृपया From, To और Date भरें':'Please fill From, To and Date');
+            return;
+          }
+        } else {
+          if(!fields.flightFrom.value.trim()||!fields.flightTo.value.trim()||!fields.departureDate.value){
+            alert(LANG==='hi'?'कृपया Flight From, Flight To और Departure Date भरें':'Please fill Flight From, Flight To and Departure Date');
+            return;
+          }
+          if(tripType === 'roundTrip' && !fields.returnDate.value){
+            alert(LANG==='hi'?'कृपया Return Date भरें':'Please fill Return Date');
+            return;
+          }
         }
       }
       if(n===3){
@@ -529,8 +724,16 @@
       }
       if(n>=2){
         const paxCount = document.querySelectorAll('.paxRow').length;
-        const tatkalText = fields.tatkal.checked ? (LANG==='hi' ? ' (तत्काल)' : ' (Tatkal)') : '';
-        const recap = `${(LANG==='hi')? 'कहां से':''} ${fields.from.value}\n${(LANG==='hi')? 'कहां तक':''} ${fields.to.value}\n${(LANG==='hi')? 'तिथि':''} ${fields.date.value}\n${(LANG==='hi')? 'क्लास':''} ${fields.cls.value}${tatkalText}\n${(LANG==='hi')? 'यात्री': 'Passengers'}: ${paxCount}`;
+        let recap = '';
+        
+        if(travelType === 'train') {
+          const tatkalText = fields.tatkal.checked ? (LANG==='hi' ? ' (तत्काल)' : ' (Tatkal)') : '';
+          recap = `${(LANG==='hi')? 'कहां से':''} ${fields.from.value}\n${(LANG==='hi')? 'कहां तक':''} ${fields.to.value}\n${(LANG==='hi')? 'तिथि':''} ${fields.date.value}\n${(LANG==='hi')? 'क्लास':''} ${fields.cls.value}${tatkalText}\n${(LANG==='hi')? 'यात्री': 'Passengers'}: ${paxCount}`;
+        } else {
+          const tripTypeText = tripType === 'roundTrip' ? (LANG==='hi' ? 'राउंड ट्रिप' : 'Round Trip') : (LANG==='hi' ? 'वन-वे' : 'One Way');
+          recap = `${(LANG==='hi')? 'उड़ान कहां से':''} ${fields.flightFrom.value}\n${(LANG==='hi')? 'उड़ान कहां तक':''} ${fields.flightTo.value}\n${(LANG==='hi')? 'जाने की तिथि':''} ${fields.departureDate.value}\n${tripType === 'roundTrip' ? `${(LANG==='hi')? 'वापसी की तिथि':''} ${fields.returnDate.value}\n` : ''}${(LANG==='hi')? 'क्लास':''} ${fields.flightClass.value}\n${(LANG==='hi')? 'यात्री': 'Passengers'}: ${paxCount}`;
+        }
+        
         sum1.textContent = recap;
       }
       if(n===3){
@@ -559,9 +762,13 @@
             <label class="lbl-aadhar" style="display: none;">${S.aadhar}</label>
             <input class="aadhar" inputmode="numeric" pattern="[0-9]{12}" placeholder="1234 5678 9012" style="display: none;" />
           </div>
-          <div>
+          <div id="seatPreferenceSection">
             <label class="lbl-seat">${S.seat}</label>
             <select class="seatSel"></select>
+          </div>
+          <div id="flightSeatSection" style="display:none;">
+            <label class="lbl-seat">${S.seat}</label>
+            <select class="flightSeatSel"></select>
           </div>
           <div style="display:flex;align-items:end;">
             <button type="button" class="btn danger btn-remove">${S.remove}</button>
@@ -608,22 +815,40 @@
           name: row.querySelector('.name').value,
           age: row.querySelector('.age').value,
           aadhar: index === 0 ? row.querySelector('.aadhar').value : 'नहीं दिया गया',
-          seat: row.querySelector('.seatSel').value
+          seat: travelType === 'train' ? row.querySelector('.seatSel').value : row.querySelector('.flightSeatSel').value
         });
       });
       
-      // Create message
-      const tatkalText = fields.tatkal.checked ? (LANG==='hi' ? '%0A*तत्काल बुकिंग:* हाँ' : '%0A*Tatkal Booking:* Yes') : '';
-      const message = `*टिकट रिक्वेस्ट डिटेल्स* 🚆%0A%0A` +
-        `*From:* ${fields.from.value}%0A` +
-        `*To:* ${fields.to.value}%0A` +
-        `*Date:* ${fields.date.value}%0A` +
-        `*Class:* ${fields.cls.value}${tatkalText}%0A%0A` +
-        `*यात्री विवरण:*%0A` +
-        passengers.map((p, i) => 
-          `${i+1}. ${p.name} (उम्र: ${p.age}, आधार: ${p.aadhar || 'नहीं दिया गया'}, सीट: ${p.seat})`
-        ).join('%0A') +
-        `%0A%0Aकृपया इस टिकट की उपलब्धता की पुष्टि करें।`;
+      // Create message based on travel type
+      let message = '';
+      
+      if(travelType === 'train') {
+        const tatkalText = fields.tatkal.checked ? (LANG==='hi' ? '%0A*तत्काल बुकिंग:* हाँ' : '%0A*Tatkal Booking:* Yes') : '';
+        message = `*ट्रेन टिकट रिक्वेस्ट डिटेल्स* 🚆%0A%0A` +
+          `*From:* ${fields.from.value}%0A` +
+          `*To:* ${fields.to.value}%0A` +
+          `*Date:* ${fields.date.value}%0A` +
+          `*Class:* ${fields.cls.value}${tatkalText}%0A%0A` +
+          `*यात्री विवरण:*%0A` +
+          passengers.map((p, i) => 
+            `${i+1}. ${p.name} (उम्र: ${p.age}, आधार: ${p.aadhar || 'नहीं दिया गया'}, सीट: ${p.seat})`
+          ).join('%0A');
+      } else {
+        const tripTypeText = tripType === 'roundTrip' ? (LANG==='hi' ? 'राउंड ट्रिप' : 'Round Trip') : (LANG==='hi' ? 'वन-वे' : 'One Way');
+        message = `*फ्लाइट टिकट रिक्वेस्ट डिटेल्स* ✈️%0A%0A` +
+          `*From:* ${fields.flightFrom.value}%0A` +
+          `*To:* ${fields.flightTo.value}%0A` +
+          `*Departure Date:* ${fields.departureDate.value}%0A` +
+          (tripType === 'roundTrip' ? `*Return Date:* ${fields.returnDate.value}%0A` : '') +
+          `*Class:* ${fields.flightClass.value}%0A` +
+          `*Trip Type:* ${tripTypeText}%0A%0A` +
+          `*यात्री विवरण:*%0A` +
+          passengers.map((p, i) => 
+            `${i+1}. ${p.name} (उम्र: ${p.age}, आधार: ${p.aadhar || 'नहीं दिया गया'}, सीट: ${p.seat})`
+          ).join('%0A');
+      }
+      
+      message += `%0A%0Aकृपया इस टिकट की उपलब्धता की पुष्टि करें।`;
       
       // Update WhatsApp button with the details
       whatsappBtn.href = `https://wa.me/919458051202?text=${message}`;
@@ -631,6 +856,60 @@
 
     // Initialize
     applyLang();
+    
+    // Set minimum date for date inputs to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('date').setAttribute('min', today);
+    document.getElementById('departureDate').setAttribute('min', today);
+    document.getElementById('returnDate').setAttribute('min', today);
+    
+    // Update return date min date when departure date changes
+    document.getElementById('departureDate').addEventListener('change', function() {
+      document.getElementById('returnDate').setAttribute('min', this.value);
+    });
+
+    // Initialize travel type buttons
+    document.getElementById('trainOption').addEventListener('click', function() {
+      selectTravelType('train');
+    });
+    
+    document.getElementById('flightOption').addEventListener('click', function() {
+      selectTravelType('flight');
+    });
+
+    // Initialize trip type buttons
+    document.getElementById('oneWayOption').addEventListener('click', function() {
+      selectTripType('oneWay');
+    });
+    
+    document.getElementById('roundTripOption').addEventListener('click', function() {
+      selectTripType('roundTrip');
+    });
+
+    // Initialize navigation buttons
+    document.getElementById('t_next1').addEventListener('click', function() {
+      goStep(2);
+    });
+    
+    document.getElementById('t_back1').addEventListener('click', function() {
+      goStep(1);
+    });
+    
+    document.getElementById('t_next2').addEventListener('click', function() {
+      goStep(3);
+    });
+    
+    document.getElementById('t_back2').addEventListener('click', function() {
+      goStep(2);
+    });
+    
+    document.getElementById('t_addPax').addEventListener('click', function() {
+      addPassenger();
+    });
+
+    // Set initial state
+    selectTravelType('train');
+    selectTripType('oneWay');
   </script>
 </body>
 </html>
