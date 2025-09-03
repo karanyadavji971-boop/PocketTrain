@@ -28,6 +28,27 @@
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans";
       padding:16px;
     }
+    
+    /* सीमित समय ऑफर टेक्स्ट स्टाइल */
+    .limited-offer-text {
+      text-align: center;
+      padding: 8px 15px;
+      margin-bottom: 16px;
+      color: #ffcc00;
+      font-weight: bold;
+      font-size: 16px;
+      background: rgba(255, 204, 0, 0.1);
+      border-radius: 8px;
+      border: 1px dashed #ffcc00;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; }
+      100% { opacity: 0.8; }
+    }
+    
     .wrap{min-height:100vh; display:flex; justify-content:center; align-items:center;}
     .card{
       width:100%;
@@ -250,6 +271,11 @@
 <body>
   <div class="wrap">
     <div class="card">
+      <!-- सीमित समय ऑफर टेक्स्ट -->
+      <div class="limited-offer-text">
+        ⚡ सीमित समय ऑफर: अभी बुक करें और 10% से 20% तक की छूट पाएं! ⚡
+      </div>
+      
       <div class="topbar">
         <div>
           <h1 id="t_title">टिकट रिक्वेस्ट</h1>
@@ -348,7 +374,7 @@
               <select id="flightClass" class="compact-select">
                 <option value="Economy">इकोनॉमी</option>
                 <option value="Premium Economy">प्रीमियम इकोनॉमी</option>
-                <option value="Business">बिजनेस</option>
+                <option value="Business">बि�जनेस</option>
                 <option value="First">फर्स्ट</option>
               </select>
             </div>
@@ -495,7 +521,7 @@
         msg1: 'अभी आपको 10 मिनट के अंदर एडमिन बताएगा कि टिकट बुक हो पाएगी या नहीं। अगर टिकट बुक होने वाली है तभी पेमेंट करें, अन्यथा पेमेंट न करें。',
         start: '10-मिनट टाइमर शुरू करें',
         pay: 'एडमिन कन्फर्म के बाद पेमेंट',
-        foot: 'नोट: UPI पेमेंट आपकी ऐप में खुलेगा। पेमेंट एडमین कन्फर्मेशन के बाद ही करें。',
+        foot: 'नोट: UPI पेमेंट आपकी ऐप में खुलेगा। पेमेंट एडमिन कन्फर्मेशन के बाद ही करें。',
         name:'नाम', age:'उम्र', aadhar:'आधार (किसी 1 का अनिवार्य)', seat:'सीट पसंद', remove:'हटाएं',
         seatOpts:['Upper','Middle','Lower','Side Upper','Side Lower'],
         flightSeatOpts:['विंडो','एसील','मिडिल'],
@@ -657,7 +683,14 @@
       document.getElementById('trainOption').classList.toggle('active', type === 'train');
       document.getElementById('flightOption').classList.toggle('active', type === 'flight');
       document.getElementById('trainOptions').style.display = type === 'train' ? 'block' : 'none';
-      document.getElementById('flightOptions').classList.toggle('active', type === 'flight');
+      
+      // Fix for flight options display
+      const flightOptions = document.getElementById('flightOptions');
+      if (type === 'flight') {
+        flightOptions.classList.add('active');
+      } else {
+        flightOptions.classList.remove('active');
+      }
       
       // Update seat preference section
       document.getElementById('seatPreferenceSection').style.display = type === 'train' ? 'block' : 'none';
